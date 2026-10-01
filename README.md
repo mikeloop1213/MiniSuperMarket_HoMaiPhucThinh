@@ -1,7 +1,6 @@
-🛒 MINISUPERMARKET SYSTEM
-Hệ thống Quản lý Siêu thị Mini
-
-Môn học: Lập trình Ứng dụng .NET Core (Mã môn: 229162) Buổi thực hành: Buổi 2 - Bảo mật Web API bằng JWT, phân quyền theo vai trò và màn hình Đăng nhập cho WinForms
+# 🛒 HỆ THỐNG QUẢN LÝ SIÊU THỊ MINI (MINISUPERMARKET SYSTEM)
+> **Môn học:** Lập trình Ứng dụng .NET Core (Mã môn: 229162)  
+> **Buổi thực hành:** Buổi 2 - Bảo mật Web API bằng JWT, phân quyền theo vai trò và màn hình Đăng nhập cho WinForms
 
 </div>
 📑 Mục lục
