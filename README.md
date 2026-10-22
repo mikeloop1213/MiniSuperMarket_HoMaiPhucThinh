@@ -1,9 +1,7 @@
-# 🛒 NGHIÊN CỨU VÀ XÂY DỰNG ỨNG DỤNG QUẢN LÝ CỬA HÀNG BÁN LẺ (SIÊU THỊ MINI ZEN MART) - BUỔI 4
+# 🛒 NGHIÊN CỨU VÀ XÂY DỰNG ỨNG DỤNG QUẢN LÝ CỬA HÀNG BÁN LẺ (SIÊU THỊ MINI ZEN MART)
 
 > **Môn học:** Lập trình Ứng dụng .NET Core (Mã môn: 229162)  
-> **Nội dung:** Xây dựng Web API Quản lý Nhóm hàng (Category) & Tích hợp WinForms UI Shell  
-> **Kiến trúc:** ASP.NET Core Web API (Backend) + WinForms Single-Form Shell (Client POS)  
-> **Bảo mật:** JWT Bearer Authentication & Role-Based Access Control (RBAC)  
+> **Buổi thực hành:** Buổi 4 - THIẾT KẾ KIẾN TRÚC GIAO DIỆN WINFORMS SHELL (SIDEBAR & MAIN WORKSPACE) VÀ ĐIỀU HƯỚNG PHÂN QUYỀN (ADMIN / CASHIER / WAREHOUSE)
 
 ---
 
