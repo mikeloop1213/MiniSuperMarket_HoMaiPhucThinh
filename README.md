@@ -2,6 +2,8 @@
 
 Đồ án môn học xây dựng phần mềm quản lý siêu thị mini gồm **Web API (ASP.NET Core 8)** làm backend và **ứng dụng WinForms (.NET 8)** làm giao diện cho nhân viên. Hệ thống hỗ trợ bán hàng tại quầy (POS), quản lý danh mục, sản phẩm, tồn kho, khách hàng thân thiết, phân quyền theo vai trò và báo cáo doanh thu.
 
+**Sinh viên thực hiện:** Hồ Mai Phúc Thịnh
+
 ---
 
 ## 📌 Mục lục
@@ -11,10 +13,11 @@
 3. [Cấu trúc thư mục](#-cấu-trúc-thư-mục)
 4. [Cài đặt & chạy chương trình](#-cài-đặt--chạy-chương-trình)
 5. [Tài khoản đăng nhập mẫu](#-tài-khoản-đăng-nhập-mẫu)
-6. [Phân quyền theo vai trò](#-phân-quyền-theo-vai-trò)
-7. [Danh sách API](#-danh-sách-api)
-8. [Cơ sở dữ liệu](#-cơ-sở-dữ-liệu)
-9. [Xử lý lỗi thường gặp](#-xử-lý-lỗi-thường-gặp)
+6. [Hướng dẫn sử dụng nhanh](#-hướng-dẫn-sử-dụng-nhanh)
+7. [Phân quyền theo vai trò](#-phân-quyền-theo-vai-trò)
+8. [Danh sách API](#-danh-sách-api)
+9. [Cơ sở dữ liệu](#-cơ-sở-dữ-liệu)
+10. [Xử lý lỗi thường gặp](#-xử-lý-lỗi-thường-gặp)
 
 ---
 
@@ -36,9 +39,10 @@
 
 ### Báo cáo & thống kê
 - **Dashboard** với 4 thẻ chỉ số: doanh thu hôm nay, tổng số hóa đơn, khách hàng mới, số mặt hàng sắp hết.
-- **Biểu đồ cột** doanh thu theo ngày trong khoảng thời gian tùy chọn (Từ ngày → Đến ngày).
+- **Biểu đồ cột** doanh thu theo ngày trong khoảng thời gian tùy chọn (Từ ngày → Đến ngày): mỗi cột chia màu theo 5 sản phẩm bán nhiều nhất (phần còn lại gộp "Sản phẩm khác"), kèm đường **Tổng thực thu** và số tiền trên đỉnh. Rê chuột để xem chi tiết.
 - **Top 5 sản phẩm bán chạy nhất.**
 - **Báo cáo doanh thu ca** bằng Stored Procedure.
+- **Danh sách đơn hàng khách đã đặt** theo ngày, lọc theo tên / SĐT khách; bấm một đơn để xem chi tiết từng sản phẩm, tiền giảm và tiền thực thu.
 - **Xuất Excel (.xlsx) / CSV** danh mục sản phẩm và doanh thu.
 
 ---
@@ -158,13 +162,39 @@ Khi khởi động, API tự tạo 4 tài khoản trên nếu database chưa có
 
 ---
 
+## 🧭 Hướng dẫn sử dụng nhanh
+
+### Admin
+1. Đăng nhập `admin` → màn hình **Dashboard** mở đầu tiên với 4 thẻ chỉ số, biểu đồ và Top 5.
+2. Chọn **Từ ngày / Đến ngày** → **Xem biểu đồ** để so sánh doanh thu từng ngày.
+3. Vào **Báo cáo Doanh thu** → chọn ngày → **Xem doanh thu ca** để xem tổng đơn, doanh thu, mặt hàng dẫn đầu và danh sách đơn hàng trong ngày.
+4. Vào **Quản lý Sản phẩm** để thêm / sửa / xóa; dòng màu đỏ là hàng sắp hết, bấm huy hiệu đỏ để lọc nhanh.
+5. Bấm **📥 Xuất Excel** để tải danh sách sản phẩm hoặc doanh thu.
+6. Vào **Quản trị Tài khoản** để tạo nhân viên mới, khóa tài khoản hoặc đặt lại mật khẩu.
+
+### Thu ngân (Cashier)
+1. Đăng nhập `cashier` → màn hình **POS** mở sẵn.
+2. Quét / nhập mã vạch rồi nhấn **Enter**; quét lại cùng mã để tăng số lượng.
+3. Nhập SĐT khách → **Tìm**; nếu khách đủ 50 điểm có thể tick **"Dùng 50 điểm trừ 50.000 đ"**.
+4. Nhập tiền khách đưa (hoặc bấm nút mệnh giá) → **Thanh toán (F9)**.
+5. Có thể xem danh sách sản phẩm, tồn kho và thông tin khách hàng, nhưng **không** thêm / sửa / xóa.
+
+### Thủ kho (Warehouse)
+1. Đăng nhập `warehouse` → màn hình **Quản lý Sản phẩm & Kho hàng**.
+2. Cập nhật tồn kho khi nhập hàng, thêm sản phẩm mới, quản lý nhóm hàng.
+3. Theo dõi huy hiệu **hàng sắp hết** để chủ động nhập thêm.
+
+---
+
 ## 🛡 Phân quyền theo vai trò
 
 | Chức năng | Admin | Cashier | Warehouse | Customer |
 |---|:---:|:---:|:---:|:---:|
 | Dashboard, báo cáo doanh thu | ✅ | ❌ | ❌ | ❌ |
+| Xem danh sách đơn hàng | ✅ | ❌ | ❌ | ❌ |
 | Bán hàng POS, đổi điểm | ✅ | ✅ | ❌ | ❌ |
-| Xem danh mục / sản phẩm | ✅ | ✅ (chỉ xem) | ✅ | ❌ |
+| Xem danh mục nhóm hàng | ✅ | ❌ | ✅ | ❌ |
+| Xem sản phẩm, tồn kho | ✅ | ✅ (chỉ xem) | ✅ | ❌ |
 | Thêm / sửa danh mục, sản phẩm | ✅ | ❌ | ✅ | ❌ |
 | Xóa danh mục, sản phẩm | ✅ | ❌ | ❌ | ❌ |
 | Xem khách hàng | ✅ | ✅ (chỉ xem) | ❌ | ❌ |
@@ -173,7 +203,8 @@ Khi khởi động, API tự tạo 4 tài khoản trên nếu database chưa có
 | Xuất Excel / CSV | ✅ | ✅ | ✅ | ❌ |
 
 - Phân quyền được kiểm tra ở **cả hai phía**: API dùng `[Authorize(Roles = ...)]`, còn WinForms ẩn / hiện nút menu theo vai trò.
-- Thu ngân bấm Thêm / Sửa / Xóa sẽ nhận thông báo *"Chỉ Admin mới có quyền chỉnh sửa dữ liệu!"*.
+- Với tài khoản Thu ngân, các nút Thêm / Sửa / Xóa được **ẩn đi**; nếu gọi thẳng API vẫn bị chặn (403) và hiện thông báo *"Chỉ Admin mới có quyền chỉnh sửa dữ liệu!"*.
+- Tài khoản Customer chỉ thấy màn hình chào, không vào được mục quản lý nào.
 
 ---
 
@@ -194,10 +225,12 @@ Tất cả API (trừ đăng nhập) đều yêu cầu header `Authorization: Be
 | POST / PUT / DELETE | `/api/products/{id}` | Thêm / sửa / xóa sản phẩm |
 | GET | `/api/customers/by-phone/{phone}` | Tra cứu khách theo SĐT |
 | POST | `/api/orders/checkout` | Thanh toán (Transaction) |
+| GET | `/api/orders?fromDate=&toDate=&keyword=` | Danh sách đơn hàng, lọc theo khách |
 | GET | `/api/orders/{id}` | Chi tiết hóa đơn |
 | GET | `/api/orders/report?date=` | Báo cáo doanh thu ca (Stored Procedure) |
 | GET | `/api/reports/dashboard-summary` | 4 thẻ chỉ số Dashboard |
-| GET | `/api/reports/revenue-by-date?fromDate=&toDate=` | Doanh thu theo ngày |
+| GET | `/api/reports/revenue-by-date?fromDate=&toDate=` | Doanh thu theo ngày (Stored Procedure) |
+| GET | `/api/reports/revenue-by-product?fromDate=&toDate=` | Doanh thu từng sản phẩm theo ngày |
 | GET | `/api/reports/top-products?top=5` | Top sản phẩm bán chạy |
 
 Mã trạng thái trả về: **200** thành công, **201** tạo mới, **204** cập nhật / xóa xong, **400** dữ liệu sai, **401** chưa đăng nhập, **403** không đủ quyền, **404** không tìm thấy.
@@ -222,6 +255,22 @@ Mã trạng thái trả về: **200** thành công, **201** tạo mới, **204**
 
 ---
 
+## 🧪 Kịch bản kiểm thử nhanh
+
+| # | Thao tác | Kết quả mong đợi |
+|---|---|---|
+| 1 | Gọi API bất kỳ trên Swagger khi chưa bấm **Authorize** | Trả về **401 Unauthorized** |
+| 2 | Đăng nhập `cashier`, gọi `DELETE /api/products/1` | Trả về **403 Forbidden** |
+| 3 | Thêm sản phẩm có giá bán = 0 | Trả về **400**, báo *"Giá bán phải lớn hơn 0"* |
+| 4 | Ở POS quét mã `893500123001` hai lần | Giỏ hàng còn 1 dòng, số lượng = 2 |
+| 5 | Bán số lượng lớn hơn tồn kho | Báo hết hàng, **không** sinh hóa đơn mới (Rollback) |
+| 6 | Khách ≥ 50 điểm, hóa đơn ≥ 50.000 đ, tick đổi điểm | Tổng tiền giảm 50.000 đ, điểm khách bị trừ 50 |
+| 7 | Sửa tồn kho một sản phẩm về 5 | Dòng sản phẩm tô đỏ, huy hiệu và thẻ Dashboard báo hàng sắp hết |
+| 8 | Bấm **Xuất Excel** ở màn Sản phẩm | Tệp `.xlsx` mở được, đủ toàn bộ sản phẩm, tiếng Việt đúng dấu |
+| 9 | Tắt API rồi bấm một chức năng ở WinForms | Hiện hộp thoại báo lỗi kết nối, chương trình không bị văng |
+
+---
+
 ## 🩹 Xử lý lỗi thường gặp
 
 | Hiện tượng | Cách xử lý |
@@ -232,8 +281,12 @@ Mã trạng thái trả về: **200** thành công, **201** tạo mới, **204**
 | Biểu đồ không hiển thị | Restore NuGet để tải gói `WinForms.DataVisualization` |
 | Xuất Excel báo không ghi được tệp | Đóng tệp đang mở trong Excel rồi xuất lại |
 | Sửa code nhưng chương trình không đổi | Bấm **Stop** rồi **Start** lại; chọn **Yes to All** khi VS hỏi tải lại file |
+| Biểu đồ chỉ có 1 cột / các ngày dồn vào nhau | Kiểm tra đã chọn đúng khoảng ngày và các đơn hàng có `OrderDate` khác nhau |
+| Danh sách đơn hàng trống | Chọn đúng ngày có bán hàng, xóa ô lọc khách rồi bấm **Lọc đơn hàng** |
 
 ---
+
+> 📚 Đồ án phục vụ mục đích học tập. Mật khẩu đang lưu dạng văn bản thường để dễ kiểm thử; khi triển khai thực tế cần mã hóa (ví dụ BCrypt).
 
 ## 👨‍💻 6. Tác giả
 * **Họ tên sinh viên:** Hồ Mai Phúc Thịnh
