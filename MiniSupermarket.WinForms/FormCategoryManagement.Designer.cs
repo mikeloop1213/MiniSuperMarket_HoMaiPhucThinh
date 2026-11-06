@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Xml.Linq;
@@ -17,6 +17,8 @@ namespace MiniSupermarket.WinForms
         private void InitializeComponent()
         {
             grpSearch = new GroupBox();
+            btnOpenCustomers = new Button();
+            btnOpenRoles = new Button();
             btnLoad = new Button();
             btnSearch = new Button();
             txtKeyword = new TextBox();
@@ -44,7 +46,11 @@ namespace MiniSupermarket.WinForms
             grpInfo.SuspendLayout();
             statusStrip1.SuspendLayout();
             SuspendLayout();
+            // 
             // grpSearch
+            // 
+            grpSearch.Controls.Add(btnOpenCustomers);
+            grpSearch.Controls.Add(btnOpenRoles);
             grpSearch.Controls.Add(btnLoad);
             grpSearch.Controls.Add(btnSearch);
             grpSearch.Controls.Add(txtKeyword);
@@ -53,31 +59,63 @@ namespace MiniSupermarket.WinForms
             grpSearch.Size = new Size(475, 65);
             grpSearch.TabIndex = 0;
             grpSearch.TabStop = false;
-            grpSearch.Text = "Tìm kiếm";
+            grpSearch.Text = "Tìm kiếm & Phân hệ";
+            // 
+            // btnOpenCustomers
+            // 
+            btnOpenCustomers.BackColor = SystemColors.ControlLight;
+            btnOpenCustomers.Font = new System.Drawing.Font("Segoe UI", 9F, FontStyle.Bold);
+            btnOpenCustomers.Location = new Point(377, 22);
+            btnOpenCustomers.Name = "btnOpenCustomers";
+            btnOpenCustomers.Size = new Size(90, 28);
+            btnOpenCustomers.TabIndex = 4;
+            btnOpenCustomers.Text = "QL Khách";
+            btnOpenCustomers.UseVisualStyleBackColor = false;
+            btnOpenCustomers.Click += btnOpenCustomers_Click;
+            // 
+            // btnOpenRoles
+            // 
+            btnOpenRoles.BackColor = SystemColors.ControlLight;
+            btnOpenRoles.Font = new System.Drawing.Font("Segoe UI", 9F, FontStyle.Bold);
+            btnOpenRoles.Location = new Point(292, 22);
+            btnOpenRoles.Name = "btnOpenRoles";
+            btnOpenRoles.Size = new Size(80, 28);
+            btnOpenRoles.TabIndex = 3;
+            btnOpenRoles.Text = "QL Vai trò";
+            btnOpenRoles.UseVisualStyleBackColor = false;
+            btnOpenRoles.Click += btnOpenRoles_Click;
+            // 
             // btnLoad
-            btnLoad.Location = new Point(377, 22);
+            // 
+            btnLoad.Location = new Point(227, 22);
             btnLoad.Name = "btnLoad";
-            btnLoad.Size = new Size(85, 28);
+            btnLoad.Size = new Size(60, 28);
             btnLoad.TabIndex = 2;
             btnLoad.Text = "Tải lại";
             btnLoad.UseVisualStyleBackColor = true;
             btnLoad.Click += btnLoad_Click;
+            // 
             // btnSearch
-            btnSearch.Location = new Point(286, 22);
+            // 
+            btnSearch.Location = new Point(162, 22);
             btnSearch.Name = "btnSearch";
-            btnSearch.Size = new Size(85, 28);
+            btnSearch.Size = new Size(60, 28);
             btnSearch.TabIndex = 1;
-            btnSearch.Text = "Tìm kiếm";
+            btnSearch.Text = "Tìm";
             btnSearch.UseVisualStyleBackColor = true;
             btnSearch.Click += btnSearch_Click;
+            // 
             // txtKeyword
+            // 
             txtKeyword.Font = new System.Drawing.Font("Segoe UI", 9.75F);
-            txtKeyword.Location = new Point(12, 24);
+            txtKeyword.Location = new Point(10, 24);
             txtKeyword.Name = "txtKeyword";
-            txtKeyword.PlaceholderText = "Nhập từ khóa...";
-            txtKeyword.Size = new Size(268, 25);
+            txtKeyword.PlaceholderText = "Từ khóa...";
+            txtKeyword.Size = new Size(147, 25);
             txtKeyword.TabIndex = 0;
+            // 
             // grpList
+            // 
             grpList.Controls.Add(dgvCategories);
             grpList.Location = new Point(12, 83);
             grpList.Name = "grpList";
@@ -85,7 +123,9 @@ namespace MiniSupermarket.WinForms
             grpList.TabIndex = 1;
             grpList.TabStop = false;
             grpList.Text = "Danh sách Nhóm hàng";
+            // 
             // dgvCategories
+            // 
             dgvCategories.AllowUserToAddRows = false;
             dgvCategories.AllowUserToDeleteRows = false;
             dgvCategories.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -101,25 +141,33 @@ namespace MiniSupermarket.WinForms
             dgvCategories.Size = new Size(469, 323);
             dgvCategories.TabIndex = 0;
             dgvCategories.CellClick += dgvCategories_CellClick;
+            // 
             // colId
+            // 
             colId.DataPropertyName = "CategoryId";
             colId.FillWeight = 25F;
             colId.HeaderText = "Mã ID";
             colId.Name = "colId";
             colId.ReadOnly = true;
+            // 
             // colName
+            // 
             colName.DataPropertyName = "CategoryName";
             colName.FillWeight = 45F;
             colName.HeaderText = "Tên Nhóm hàng";
             colName.Name = "colName";
             colName.ReadOnly = true;
+            // 
             // colDesc
+            // 
             colDesc.DataPropertyName = "Description";
             colDesc.FillWeight = 50F;
             colDesc.HeaderText = "Mô Tả";
             colDesc.Name = "colDesc";
             colDesc.ReadOnly = true;
+            // 
             // grpInfo
+            // 
             grpInfo.Controls.Add(btnDelete);
             grpInfo.Controls.Add(btnUpdate);
             grpInfo.Controls.Add(btnAdd);
@@ -135,7 +183,9 @@ namespace MiniSupermarket.WinForms
             grpInfo.TabIndex = 2;
             grpInfo.TabStop = false;
             grpInfo.Text = "Thông tin Nhóm hàng";
+            // 
             // btnDelete
+            // 
             btnDelete.Location = new Point(198, 365);
             btnDelete.Name = "btnDelete";
             btnDelete.Size = new Size(82, 32);
@@ -143,7 +193,9 @@ namespace MiniSupermarket.WinForms
             btnDelete.Text = "Xóa";
             btnDelete.UseVisualStyleBackColor = true;
             btnDelete.Click += btnDelete_Click;
+            // 
             // btnUpdate
+            // 
             btnUpdate.Location = new Point(106, 365);
             btnUpdate.Name = "btnUpdate";
             btnUpdate.Size = new Size(86, 32);
@@ -151,7 +203,9 @@ namespace MiniSupermarket.WinForms
             btnUpdate.Text = "Cập nhật";
             btnUpdate.UseVisualStyleBackColor = true;
             btnUpdate.Click += btnUpdate_Click;
+            // 
             // btnAdd
+            // 
             btnAdd.Location = new Point(14, 365);
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(86, 32);
@@ -159,7 +213,9 @@ namespace MiniSupermarket.WinForms
             btnAdd.Text = "Thêm mới";
             btnAdd.UseVisualStyleBackColor = true;
             btnAdd.Click += btnAdd_Click;
+            // 
             // txtDescription
+            // 
             txtDescription.Font = new System.Drawing.Font("Segoe UI", 9.75F);
             txtDescription.Location = new Point(14, 190);
             txtDescription.Multiline = true;
@@ -168,56 +224,74 @@ namespace MiniSupermarket.WinForms
             txtDescription.ScrollBars = ScrollBars.Vertical;
             txtDescription.Size = new Size(266, 155);
             txtDescription.TabIndex = 5;
+            // 
             // lblDescription
+            // 
             lblDescription.AutoSize = true;
             lblDescription.Location = new Point(14, 168);
             lblDescription.Name = "lblDescription";
-            lblDescription.Size = new Size(45, 15);
+            lblDescription.Size = new Size(43, 15);
             lblDescription.TabIndex = 4;
             lblDescription.Text = "Mô Tả:";
+            // 
             // txtCategoryName
+            // 
             txtCategoryName.Font = new System.Drawing.Font("Segoe UI", 9.75F);
             txtCategoryName.Location = new Point(14, 115);
             txtCategoryName.Name = "txtCategoryName";
             txtCategoryName.Size = new Size(266, 25);
             txtCategoryName.TabIndex = 3;
+            // 
             // lblCategoryName
+            // 
             lblCategoryName.AutoSize = true;
             lblCategoryName.Location = new Point(14, 93);
             lblCategoryName.Name = "lblCategoryName";
             lblCategoryName.Size = new Size(95, 15);
             lblCategoryName.TabIndex = 2;
             lblCategoryName.Text = "Tên Nhóm hàng:";
+            // 
             // txtId
+            // 
             txtId.Font = new System.Drawing.Font("Segoe UI", 9.75F);
             txtId.Location = new Point(14, 45);
             txtId.Name = "txtId";
             txtId.ReadOnly = true;
             txtId.Size = new Size(266, 25);
             txtId.TabIndex = 1;
+            // 
             // lblId
+            // 
             lblId.AutoSize = true;
             lblId.Location = new Point(14, 23);
             lblId.Name = "lblId";
-            lblId.Size = new Size(43, 15);
+            lblId.Size = new Size(41, 15);
             lblId.TabIndex = 0;
             lblId.Text = "Mã ID:";
+            // 
             // statusStrip1
+            // 
             statusStrip1.Items.AddRange(new ToolStripItem[] { lblReady, lblApiUrl });
             statusStrip1.Location = new Point(0, 440);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Size = new Size(800, 22);
             statusStrip1.TabIndex = 3;
             statusStrip1.Text = "statusStrip1";
+            // 
             // lblReady
+            // 
             lblReady.Name = "lblReady";
-            lblReady.Size = new Size(52, 17);
+            lblReady.Size = new Size(54, 17);
             lblReady.Text = "Sẵn sàng";
+            // 
             // lblApiUrl
+            // 
             lblApiUrl.Name = "lblApiUrl";
-            lblApiUrl.Size = new Size(130, 17);
-            lblApiUrl.Text = " | API: localhost:7080";
+            lblApiUrl.Size = new Size(115, 17);
+            lblApiUrl.Text = " | API: localhost:5000";
+            // 
             // FormCategoryManagement
+            // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 462);
@@ -225,6 +299,7 @@ namespace MiniSupermarket.WinForms
             Controls.Add(grpInfo);
             Controls.Add(grpList);
             Controls.Add(grpSearch);
+            ForeColor = SystemColors.ControlText;
             FormBorderStyle = FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             Name = "FormCategoryManagement";
@@ -244,6 +319,8 @@ namespace MiniSupermarket.WinForms
         }
         #endregion
         private GroupBox grpSearch;
+        private Button btnOpenCustomers;
+        private Button btnOpenRoles;
         private Button btnLoad;
         private Button btnSearch;
         private TextBox txtKeyword;

@@ -129,7 +129,7 @@ Mở `MiniSupermarket.API/appsettings.json` và chỉnh lại tên server / data
   ```powershell
   Update-Database
   ```
-- **Database đã có sẵn bảng:** API tự nhận biết và đánh dấu migration là đã áp dụng, **không tạo lại hay xóa bảng**. Nếu dữ liệu vai trò đang là tiếng Việt ("Thu ngân", "Quản lý kho"...), chạy script `MiniSupermarket.API/Database/ChuyenVe3Role.sql` trong SSMS để đổi về Admin / Cashier / Warehouse / Customer.
+- **Database đã có sẵn bảng:** API tự nhận biết và đánh dấu migration là đã áp dụng, **không tạo lại hay xóa bảng**. Nếu dữ liệu vai trò đang là tiếng Việt ("Thu ngân", "Quản lý kho"...), chạy script `MiniSupermarket.API/Database/ChuyenVe3Role.sql` trong SSMS để đổi về Admin / Cashier / Warehouse.
 
 Stored Procedure `sp_BaoCaoDoanhThuCa` và `sp_DoanhThuTheoNgay` được tự động tạo / cập nhật mỗi lần API khởi động.
 
@@ -156,9 +156,8 @@ Mật khẩu mặc định của tất cả tài khoản: **`123456`**
 | `admin` | Admin | Toàn quyền |
 | `cashier` | Cashier | Thu ngân |
 | `warehouse` | Warehouse | Thủ kho |
-| `customer` | Customer | Khách hàng |
 
-Khi khởi động, API tự tạo 4 tài khoản trên nếu database chưa có (không ghi đè tài khoản đã tồn tại).
+Khi khởi động, API tự tạo 3 tài khoản trên nếu database chưa có (không ghi đè tài khoản đã tồn tại).
 
 ---
 
@@ -188,23 +187,22 @@ Khi khởi động, API tự tạo 4 tài khoản trên nếu database chưa có
 
 ## 🛡 Phân quyền theo vai trò
 
-| Chức năng | Admin | Cashier | Warehouse | Customer |
-|---|:---:|:---:|:---:|:---:|
-| Dashboard, báo cáo doanh thu | ✅ | ❌ | ❌ | ❌ |
-| Xem danh sách đơn hàng | ✅ | ❌ | ❌ | ❌ |
-| Bán hàng POS, đổi điểm | ✅ | ✅ | ❌ | ❌ |
-| Xem danh mục nhóm hàng | ✅ | ❌ | ✅ | ❌ |
-| Xem sản phẩm, tồn kho | ✅ | ✅ (chỉ xem) | ✅ | ❌ |
-| Thêm / sửa danh mục, sản phẩm | ✅ | ❌ | ✅ | ❌ |
-| Xóa danh mục, sản phẩm | ✅ | ❌ | ❌ | ❌ |
-| Xem khách hàng | ✅ | ✅ (chỉ xem) | ❌ | ❌ |
-| Thêm / sửa / xóa khách hàng | ✅ | ❌ | ❌ | ❌ |
-| Quản trị tài khoản, vai trò | ✅ | ❌ | ❌ | ❌ |
-| Xuất Excel / CSV | ✅ | ✅ | ✅ | ❌ |
+| Chức năng | Admin | Cashier | Warehouse |
+|---|:---:|:---:|:---:|
+| Dashboard, báo cáo doanh thu | ✅ | ❌ | ❌ |
+| Xem danh sách đơn hàng | ✅ | ❌ | ❌ |
+| Bán hàng POS, đổi điểm | ✅ | ✅ | ❌ |
+| Xem danh mục nhóm hàng | ✅ | ❌ | ✅ |
+| Xem sản phẩm, tồn kho | ✅ | ✅ (chỉ xem) | ✅ |
+| Thêm / sửa danh mục, sản phẩm | ✅ | ❌ | ✅ |
+| Xóa danh mục, sản phẩm | ✅ | ❌ | ❌ |
+| Xem khách hàng | ✅ | ✅ (chỉ xem) | ❌ |
+| Thêm / sửa / xóa khách hàng | ✅ | ❌ | ❌ |
+| Quản trị tài khoản, vai trò | ✅ | ❌ | ❌ |
+| Xuất Excel / CSV | ✅ | ✅ | ✅ |
 
 - Phân quyền được kiểm tra ở **cả hai phía**: API dùng `[Authorize(Roles = ...)]`, còn WinForms ẩn / hiện nút menu theo vai trò.
 - Với tài khoản Thu ngân, các nút Thêm / Sửa / Xóa được **ẩn đi**; nếu gọi thẳng API vẫn bị chặn (403) và hiện thông báo *"Chỉ Admin mới có quyền chỉnh sửa dữ liệu!"*.
-- Tài khoản Customer chỉ thấy màn hình chào, không vào được mục quản lý nào.
 
 ---
 
@@ -287,8 +285,3 @@ Mã trạng thái trả về: **200** thành công, **201** tạo mới, **204**
 ---
 
 > 📚 Đồ án phục vụ mục đích học tập. Mật khẩu đang lưu dạng văn bản thường để dễ kiểm thử; khi triển khai thực tế cần mã hóa (ví dụ BCrypt).
-
-## 👨‍💻 6. Tác giả
-* **Họ tên sinh viên:** Hồ Mai Phúc Thịnh
-* **Mã sinh viên:** 2124110119
-* **Lớp học phần:** CCQ2411D

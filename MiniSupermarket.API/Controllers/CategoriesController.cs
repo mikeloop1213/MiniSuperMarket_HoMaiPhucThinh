@@ -1,103 +1,162 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MiniSupermarket.API.Data;
+using MiniSupermarket.API.Dtos;
 using MiniSupermarket.API.Models;
 
 namespace MiniSupermarket.API.Controllers
 {
-    [Route("api/[controller]")] // Định tuyến cơ sở: /api/categories
+    [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CategoriesController : ControllerBase
     {
+        private readonly SupermarketDbContext _context;
 
-        // Dữ liệu mẫu lưu tạm trên bộ nhớ RAM (In-Memory) phục vụ kiểm thử khi chưa có Database
-        private static readonly List<Category> _categories = new() {
-            new Category { CategoryId = 1, CategoryName = "Bánh kẹo & Đồ ăn vặt", Description = "Snack, bánh quy, kẹo dẻo" },
-            new Category { CategoryId = 2, CategoryName = "Nước giải khát & Trà", Description = "Nước ngọt, nước khoáng, trà" },
-            new Category { CategoryId = 3, CategoryName = "Sữa & Sản phẩm từ sữa", Description = "Sữa tươi, sữa chua, phô mai" },
-            new Category { CategoryId = 4, CategoryName = "Mì gói & Thực phẩm ăn liền", Description = "Mì ăn liền, phở khô, cháo gói" },
-            new Category { CategoryId = 5, CategoryName = "Gia vị & Dầu ăn", Description = "Nước mắm, hạt nêm, dầu thực vật" }
-        };
+        public CategoriesController(SupermarketDbContext context)
+        {
+            _context = context;
+        }
 
-        // 1. READ: Lấy toàn bộ danh sách nhóm hàng (GET /api/categories)
+        //GET /api/categories -> lay toan bo nhom hang
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            // Trả về mã 200 OK kèm theo danh sách JSON
-            return Ok(_categories);
+            var list = await _context.Categories
+                .AsNoTracking()
+                .OrderBy(c => c.CategoryId)
+                .Select(c => new CategoryDto
+                {
+                    CategoryId = c.CategoryId,
+                    CategoryName = c.CategoryName,
+                    Description = c.Description
+                })
+                .ToListAsync();
+            return Ok(list);
         }
 
-        // 2. READ: Lấy chi tiết một nhóm hàng theo ID (GET /api/categories/{id})
-        [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        //GET /api/categories/{id}
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById(int id)
         {
-            var cat = _categories.FirstOrDefault(c => c.CategoryId == id);
-            if (cat == null)
+            var dto = await _context.Categories
+                .AsNoTracking()
+                .Where(c => c.CategoryId == id)
+                .Select(c => new CategoryDto { CategoryId = c.CategoryId, CategoryName = c.CategoryName, Description = c.Description })
+                .FirstOrDefaultAsync();
+
+            if (dto == null)
             {
-                // Trả về mã lỗi 404 nếu không tìm thấy ID tương ứng
-                return NotFound(new { message = "Không tìm thấy nhóm hàng!" });
+                return NotFound(new { message = "Không tìm thấy nhóm hàng trong CSDL!" });   // 404
             }
-            return Ok(cat);
+            return Ok(dto);
         }
 
-        // 3. SEARCH: Tìm kiếm nhóm hàng theo từ khóa qua Query String (GET /api/categories/search?keyword=...)
+        //GET /api/categories/search?keyword=... -> tim gan dung theo ten
         [HttpGet("search")]
-        public IActionResult Search([FromQuery] string keyword)
+        public async Task<IActionResult> Search([FromQuery] string keyword)
         {
             if (string.IsNullOrWhiteSpace(keyword))
             {
-                return BadRequest(new { message = "Vui lòng nhập từ khóa!" });
+                return BadRequest(new { message = "Vui lòng nhập từ khóa tìm kiếm!" });   // 400
             }
-            // Lọc danh sách theo tên chứa từ khóa (không phân biệt chữ hoa/thường)
-            var result = _categories
-                .Where(c => c.CategoryName.Contains(keyword, StringComparison.OrdinalIgnoreCase))
-                .ToList();
+
+            string kw = keyword.Trim();
+            //LINQ .Contains() -> SQL: WHERE CategoryName LIKE N'%kw%'
+            var result = await _context.Categories
+                .AsNoTracking()
+                .Where(c => c.CategoryName.Contains(kw))
+                .Select(c => new CategoryDto { CategoryId = c.CategoryId, CategoryName = c.CategoryName, Description = c.Description })
+                .ToListAsync();
+
             return Ok(result);
         }
 
-        // 4. CREATE: Thêm mới nhóm hàng (POST /api/categories)
+        //POST /api/categories -> them nhom hang
         [HttpPost]
-        public IActionResult Create([FromBody] Category newCat)
+        [Authorize(Roles = AppRoles.AdminOrWarehouse)]
+        public async Task<IActionResult> Create([FromBody] CategoryCreateUpdateDto dto)
         {
-            if (string.IsNullOrWhiteSpace(newCat.CategoryName))
-            {
-                return BadRequest(new { message = "Tên không được trống!" });
-            }
-            // Tự động tăng ID tiếp theo
-            newCat.CategoryId = _categories.Count > 0 ? _categories.Max(c => c.CategoryId) + 1 : 1;
-            _categories.Add(newCat);
+            //[ApiController] da tu kiem tra [Required]/[StringLength] tren DTO va tra 400 neu sai
 
-            // Trả về mã 201 Created kèm đường dẫn dẫn tới bản ghi mới tạo
-            return CreatedAtAction(nameof(GetById), new { id = newCat.CategoryId }, newCat);
+            var entity = new Category
+            {
+                CategoryName = dto.CategoryName.Trim(),
+                Description = dto.Description?.Trim()
+            };
+
+            _context.Categories.Add(entity);
+            await _context.SaveChangesAsync();
+
+            var result = new CategoryDto { CategoryId = entity.CategoryId, CategoryName = entity.CategoryName, Description = entity.Description };
+            return CreatedAtAction(nameof(GetById), new { id = entity.CategoryId }, result);
         }
 
-        // 5. UPDATE: Cập nhật thông tin nhóm hàng (PUT /api/categories/{id})
-        [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Category updateCat)
+        //PUT /api/categories/{id} -> cap nhat nhom hang
+        [HttpPut("{id:int}")]
+        [Authorize(Roles = AppRoles.AdminOrWarehouse)]
+        public async Task<IActionResult> Update(int id, [FromBody] CategoryCreateUpdateDto dto)
         {
-            var cat = _categories.FirstOrDefault(c => c.CategoryId == id);
+            var cat = await _context.Categories.FindAsync(id);
             if (cat == null)
             {
                 return NotFound(new { message = "Không tìm thấy nhóm hàng cần sửa!" });
             }
-            // Cập nhật giá trị mới
-            cat.CategoryName = updateCat.CategoryName;
-            cat.Description = updateCat.Description;
 
-            // Trả về mã 204 NoContent biểu thị cập nhật thành công nhưng không cần trả về dữ liệu mới
+            cat.CategoryName = dto.CategoryName.Trim();
+            cat.Description = dto.Description?.Trim();
+
+            await _context.SaveChangesAsync();
             return NoContent();
         }
 
-        // 6. DELETE: Xóa nhóm hàng theo ID (DELETE /api/categories/{id})
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        //DELETE /api/categories/{id}
+        [HttpDelete("{id:int}")]
+        [Authorize(Roles = AppRoles.AdminGroup)]//chi Admin co quyen duoc xoa
+        public async Task<IActionResult> Delete(int id)
         {
-            var cat = _categories.FirstOrDefault(c => c.CategoryId == id);
+            var cat = await _context.Categories.FindAsync(id);
             if (cat == null)
             {
                 return NotFound(new { message = "Không tìm thấy nhóm hàng cần xóa!" });
             }
-            _categories.Remove(cat);
-            return NoContent();
+
+            try
+            {
+                _context.Categories.Remove(cat);
+                await _context.SaveChangesAsync();
+                return NoContent();
+            }
+            catch (DbUpdateException)
+            {
+                //san pham trong nhom da co trong hoa don -> khong xoa duoc
+                return BadRequest(new { message = "Không thể xóa: nhóm hàng có sản phẩm đã phát sinh hóa đơn bán hàng!" });
+            }
+        }
+
+        //kiem tra quyen Admin
+        [HttpGet("admin-dashboard")]
+        [Authorize(Roles = AppRoles.AdminGroup)]
+        public async Task<IActionResult> GetAdminDashboard()
+        {
+            int totalCategories = await _context.Categories.CountAsync();
+            int totalProducts = await _context.Products.CountAsync();
+            return Ok(new
+            {
+                message = "Chào mừng Admin! Bạn có toàn quyền quản trị hệ thống siêu thị mini.",
+                totalCategories,
+                totalProducts
+            });
+        }
+
+        //kiem tra quyen ban hang (Admin va Cashier deu goi duoc)
+        [HttpGet("staff-pos")]
+        [Authorize(Roles = AppRoles.AdminOrCashier)]
+        public async Task<IActionResult> GetStaffPos()
+        {
+            int inStock = await _context.Products.CountAsync(p => p.StockQuantity > 0);
+            return Ok(new { message = "Màn hình POS Thu ngân sẵn sàng phục vụ bán hàng.", productsInStock = inStock });
         }
     }
 }
